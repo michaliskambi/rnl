@@ -23384,9 +23384,14 @@ begin
 
     end;
 
-    DispatchIncomingPacket(PayloadData^,
-                           PayloadDataLength,
-                           TRNLEndianness.LittleEndianToHost16(NormalPacketHeader^.SentTime));
+    try
+      DispatchIncomingPacket(PayloadData^,
+                             PayloadDataLength,
+                             TRNLEndianness.LittleEndianToHost16(NormalPacketHeader^.SentTime));
+    except
+      on E: EAccessViolation do
+        Writeln('Caught EAccessViolation around DispatchIncomingPacket, silencing'); // TODO: reproduce, report
+    end;
 
    finally
     PacketData:=nil;
